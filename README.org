@@ -1,0 +1,61 @@
+#+TITLE:trivial-inspect
+
+*A portable toolkit for building inspectors*
+
+~trivial-inspect~ exposes a set of utils useful in building inspectors
+akin to standard ~inspect~ and ~describe~. The goal is to provide as
+much information as possible. Including the implementation-specific
+info.
+
+* Getting Started
+Clone the Git repository:
+#+begin_src sh
+  git clone --recursive https://github.com/aartaka/trivial-inspect ~/common-lisp/
+#+end_src
+
+And then load ~:trivial-inspect~ in the REPL:
+#+begin_src lisp
+  (asdf:load-system :trivial-inspect)
+  ;; or, if you use Quicklisp
+  (ql:quickload :trivial-inspect)
+#+end_src
+
+You can also use the bundled ~guix.scm~ to install it on Guix.
+
+* APIs
+Two main entry points of this library are ~fields~:
+#+begin_src lisp
+  (trivial-inspect:fields #'identity)
+  ;; ((0 :self #<function identity>) (1 :id 1407351035)
+  ;;  (2 class-of #<sb-pcl:system-class common-lisp:function> #<function # {100A28547B}>)
+  ;;  (3 type-of compiled-function) (4 :name identity) (5 :arguments (sb-impl::thing))
+  ;;  (6 compiled-function-p t) (7 :ftype (function # #))
+  ;;  (8 :expression nil)
+  ;;  (9 lambda-list-keywords (&allow-other-keys &aux &body &environment &key sb-int:&more &optional &rest &whole))
+  ;;  (10 call-arguments-limit 1073741824) (11 lambda-parameters-limit 1073741824))
+  (trivial-inspect:fields nil)
+  ;; ((0 :self nil) (1 :id 1342177559)
+  ;;  (2 class-of #<built-in-class common-lisp:null> nil)
+  ;;  (3 type-of null) (4 length 0)
+  ;;  (5 symbol-name "NIL") (6 symbol-package #<package "COMMON-LISP">)
+  ;;  (7 :visibility :external #<function # {100CFF5F0B}>)
+  ;;  (8 symbol-value nil #<function # {100CFF5F2B}>) (9 symbol-plist nil))
+  (trivial-inspect:fields (find-class 'standard-object))
+  ;; ((0 :self #<standard-class common-lisp:standard-object>) (1 :id 68721940739)
+  ;;  (2 class-of #<standard-class common-lisp:standard-class>
+  ;;   #<function (lambda (trivial-inspect::new-value trivial-inspect::_) :in trivial-inspect:fields) {1003A7BAEB}>)
+  ;;  (3 :slot-definitions
+  ;;   (#<sb-mop:standard-effective-slot-definition sb-pcl::%type> #<sb-mop:standard-effective-slot-definition sb-pcl::source> ..)))
+#+end_src
+
+and ~description~:
+#+begin_src lisp
+  (trivial-inspect:description #'+ t)
+  ;; Compiled-function + (&REST NUMBERS)
+  ;;  : (&REST NUMBER) -> (VALUES NUMBER &OPTIONAL)
+  ;; Return the sum of its arguments. With no args, returns 0.
+  (trivial-inspect:description 'standard-class t)
+  ;; Symbol STANDARD-CLASS (EXTERNAL to COMMON-LISP) [class]
+  (trivial-inspect:description (find-class 'standard-class) t)
+  ;; Standard-class #<STANDARD-CLASS COMMON-LISP:STANDARD-CLASS>
+#+end_src
