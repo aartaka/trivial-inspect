@@ -834,7 +834,7 @@ not suitable for the `fields' key-value format."))
 
 (defmethod description ((object function) &optional stream)
   (let ((name (nth-value 2 (function-lambda-expression object))))
-    (format stream "~:[λ~*~;~a ~](~:[?~*~;~{~a~^ ~}~])~:[~;
+    (format stream "~:[λ~*~;~a ~](~:[?~*~;~{~a~^ ~}~])~:[~2*~;
  : ~a -> ~a~]~@[
 ~a~]"
             (and name (symbolp name))
