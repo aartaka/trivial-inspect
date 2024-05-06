@@ -901,7 +901,8 @@ not suitable for the `fields' key-value format."))
 (defmethod description ((object function) &optional stream)
   (let ((name (nth-value 2 (function-lambda-expression object))))
     (format stream "~:[λ~*~;~a ~](~:[?~*~;~{~a~^ ~}~])~:[~2*~;
- : ~a -> ~a~]~@[
+ : ~a -> ~a~]~:[~*~;
+ ↑ ~s~]~@[
 ~a~]"
             (and name (symbolp name))
             name
@@ -910,6 +911,8 @@ not suitable for the `fields' key-value format."))
             (not (eq :unknown (trivial-arguments:argtypes object)))
             (nth-value 0 (trivial-arguments:argtypes object))
             (nth-value 1 (trivial-arguments:argtypes object))
+            (consp (function-closure-p object))
+            (function-closure-p object)
             (documentation object t))))
 
 (-> object-description ((or standard-object structure-object) (or stream boolean)))
