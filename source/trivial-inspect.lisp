@@ -553,18 +553,84 @@ modify the property. For slots, this setter will likely be setting the
     #+sbcl
     ,@(except-sbcl-props object)))
 
-(deffields (object function)
-  `((:name ,(nth-value 2 (function-lambda-expression object)))
-    (:arguments ,(trivial-arguments:arglist object))
-    (compiled-function-p ,(compiled-function-p object))
-    ,@(when (not (eq :unknown (trivial-arguments:argtypes object)))
-        `((:ftype (function ,@(multiple-value-list (trivial-arguments:argtypes object))))))
-    (:expression ,(function-lambda-expression object))
+(-> function-closure-p ((or function generic-function standard-method)) (or boolean list))
+(defun function-closure-p (function)
+  ;; TODO: ECL returns closures somehow, but the implementation is
+  ;; terribly obscure...
+  (let ((function (if (typep function 'standard-method)
+                      (method-generic-function function)
+                      function)))
+    (declare (ignorable function))
+    #+clozure
+    (and (typep function 'ccl:compiled-lexical-closure)
+         ;; Convert to alist.
+         (loop for (name value) in (ccl::closure-closed-over-values function)
+               collect (cons name value)))
+    #+(or cmucl scl)
+    (and (= (kernel:get-type function) vm:closure-header-type)
+         (loop for i below (- (kernel:get-closure-length function)
+                              #+cmucl 1
+                              #+scl (1- vm:closure-info-offset))
+               collect (cons i (kernel:%closure-index-ref function i))))
+    #+sbcl
+    (and (sb-kernel:closurep function)
+         ;; Is that the right one?
+         (loop for i below (1- (sb-kernel:get-closure-length function))
+               collect (cons i (sb-kernel:%closure-index-ref function i))))
+    #+abcl
+    (let ((environment (nth-value 1 (function-lambda-expression function))))
+      (cond
+        ((and environment
+              (typep environment 'system::environment))
+         (system:environment-variables environment))
+        (environment environment)
+        (t nil)))
     #+allegro
-    ,@(allegro-fields object :start :code :gc-info :immed-args :locals)
-    (lambda-list-keywords ,lambda-list-keywords)
-    (call-arguments-limit ,call-arguments-limit)
-    (lambda-parameters-limit ,lambda-parameters-limit)))
+    (let* ((closure (nth-value 1 (function-lambda-expression function))))
+      (cond
+        ((typep closure 'sys::augmentable-environment)
+         (let ((ht (sys::ha$h-table-ht
+                    (slot-value (sys::augmentable-environment-base closure)
+                                'system::variable-hashtable))))
+           (typecase ht
+             (cons
+              (cons (car ht) (caadr (cadadr ht))))
+             (hash-table
+              (loop for key being the hash-key in ht
+                      using (hash-value val)
+                    collect (cons key (caar (cdadar val))))))))
+        ;; FIXME: There should be a way to crack this one!
+        ((typep closure 'excl::closure)
+         t)))
+    #+clisp
+    ;; TODO: venv fenv benv genv denv
+    (let ((closure (nth-value 1 (funcall old-function-lambda-expression function))))
+      (when (arrayp closure)
+        (loop for (name value)
+                on (coerce (elt closure 0) 'list)
+                  by #'cddr
+              while name
+              collect (cons name value))))
+    #-(or clozure cmucl scl sbcl abcl allegro clisp ecl)
+    t))
+
+(deffields (object function)
+  (multiple-value-bind (expression closure-p name)
+      (function-lambda-expression object)
+    `((:name ,name)
+      (:arguments ,(trivial-arguments:arglist object))
+      (compiled-function-p ,(compiled-function-p object))
+      ,@(when (not (eq :unknown (trivial-arguments:argtypes object)))
+          `((:ftype (function ,@(multiple-value-list (trivial-arguments:argtypes object))))))
+      (:closure-p closure-p)
+      ,@(when closure-p
+          (:closed-over (function-closure-p object)))
+      (:expression ,expression)
+      #+allegro
+      ,@(allegro-fields object :start :code :gc-info :immed-args :locals)
+      (lambda-list-keywords ,lambda-list-keywords)
+      (call-arguments-limit ,call-arguments-limit)
+      (lambda-parameters-limit ,lambda-parameters-limit))))
 
 (-> restart-interactive (restart))
 (defun restart-interactive (restart)
