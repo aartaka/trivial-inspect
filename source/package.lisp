@@ -28,7 +28,8 @@
    #+mezzano   #:mezzano.clos
    #+sicl      #:sicl-clos
    #:class-slots
-   #:slot-definition-name)
+   #:slot-definition-name
+   #:method-generic-function)
   (:documentation "`trivial-inspect' provides building blocks for interactive inspectors.
 Two main functions it exports are:
 - `fields' to get a list of inspect fields for an object.

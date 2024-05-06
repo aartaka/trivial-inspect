@@ -13,4 +13,5 @@
   :depends-on ("trivial-arguments")
   :pathname "source/"
   :components ((:file "package")
-               (:file "trivial-inspect")))
+               (:file "fields")
+               (:file "description")))
