@@ -60,8 +60,11 @@ not suitable for the `fields' key-value format."))
     (format stream "~s ~:[(~e)~;~]" object (equal general exponential) object)))
 
 (defmethod description ((object ratio) &optional stream)
-  (format stream "~s (~e)~:[~*~; ~f%~]"
-          object object (<= object 1) (* 100 (coerce object 'float))))
+  (format stream "~s (~:[~@[-~*~]~d+~s or ~;~2*~]~e)~:[~*~; ~f%~]"
+          object
+          (zerop (floor (abs object))) (minusp (signum object))
+          (floor (abs object)) (mod (abs object) 1)
+          object (<= (abs object) 1) (* 100 (coerce object 'float))))
 
 (defmethod description ((object complex) &optional stream)
   (format stream "~s (~a+~ai)" object (realpart object) (imagpart object)))
