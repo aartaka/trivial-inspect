@@ -614,6 +614,8 @@ modify the property. For slots, this setter will likely be setting the
     #-(or clozure cmucl scl sbcl abcl allegro clisp ecl)
     t))
 
+;; Generic function-specific things: method listing, method combination
+;; Method-specific thing: specializers, qualifiers
 (deffields (object function)
   (multiple-value-bind (expression closure-p name)
       (function-lambda-expression object)
