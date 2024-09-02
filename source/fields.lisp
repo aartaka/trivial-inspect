@@ -286,7 +286,7 @@ modify the property. For slots, this setter will likely be setting the
 
 (deffields (object integer)
   (append
-   `((integer-length (integer-length object)))
+   `((integer-length ,(integer-length object)))
    (when (typep object 'fixnum)
      `((most-positive-fixnum ,most-positive-fixnum)
        (most-negative-fixnum ,most-negative-fixnum)))))
