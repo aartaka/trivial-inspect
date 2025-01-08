@@ -289,7 +289,11 @@ modify the property. For slots, this setter will likely be setting the
    `((integer-length ,(integer-length object)))
    (when (typep object 'fixnum)
      `((most-positive-fixnum ,most-positive-fixnum)
-       (most-negative-fixnum ,most-negative-fixnum)))))
+       (most-negative-fixnum ,most-negative-fixnum)))
+   #+sbcl
+   (when (and (typep object '(unsigned-byte 64))
+              (ignore-errors (sb-kernel:%make-lisp-obj object)))
+     `((:object ,(sb-kernel:%make-lisp-obj object))))))
 
 (-> all-symbols ((or package symbol)) list)
 (defun all-symbols (package)
