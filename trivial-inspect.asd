@@ -1,7 +1,7 @@
 ;;;; SPDX-FileCopyrightText: Artyom Bologov
 ;;;; SPDX-License-Identifier: BSD-2 Clause
 
-(defsystem "trivial-inspect"
+(asdf:defsystem "trivial-inspect"
   :description "Portable toolkit for interactive inspectors."
   :author "Artyom Bologov"
   :homepage "https://github.com/aartaka/trivial-inspect"
