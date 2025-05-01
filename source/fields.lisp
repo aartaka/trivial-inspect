@@ -346,6 +346,12 @@ modify the property. For slots, this setter will likely be setting the
      ,(lambda (new-value _)
         (declare (ignorable _))
         (setf (readtable-case object) new-value)))
+    ;; Adapted from https://gist.github.com/sebastiancarlos/eb8ad9061767ad8bfc1e76130a9dd4ec
+    (:macro-characters (,@(loop for i upto 255
+                                for char = (code-char i)
+                                for fn = (get-macro-character char object)
+                                when fn
+                                  collect (cons char fn))))
     #+sbcl
     (:normalization
      ,(sb-ext::readtable-normalization object)
