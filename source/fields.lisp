@@ -626,7 +626,7 @@ modify the property. For slots, this setter will likely be setting the
       (compiled-function-p ,(compiled-function-p object))
       ,@(when (not (eq :unknown (trivial-arguments:argtypes object)))
           `((:ftype (function ,@(multiple-value-list (trivial-arguments:argtypes object))))))
-      (:closure-p closure-p)
+      (:closure-p ,closure-p)
       ,@(when closure-p
           `(:closed-over ,(function-closure-p object)))
       (:expression ,expression)
