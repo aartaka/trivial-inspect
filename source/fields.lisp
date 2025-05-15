@@ -384,7 +384,19 @@ modify the property. For slots, this setter will likely be setting the
     (alpha-char-p ,(alpha-char-p object))
     (graphic-char-p ,(graphic-char-p object))
     (alphanumericp ,(alphanumericp object))
-    (char-code-limit ,char-code-limit)))
+    (char-code-limit ,char-code-limit)
+    ,@(when (get-macro-character object)
+        `((:reader
+           ,(get-macro-character object)
+           ,(lambda (new _)
+              (declare (ignorable _))
+              (set-macro-character object new)))))
+    ,@(when (get-dispatch-macro-character #\# object)
+        `((:sharp-reader
+           ,(get-dispatch-macro-character #\# object)
+           ,(lambda (new _)
+              (declare (ignorable _))
+              (set-dispatch-macro-character #\# object new)))))))
 
 (deffields (object string)
   `((:uppercase ,(every #'upper-case-p object))
