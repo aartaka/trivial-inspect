@@ -59,3 +59,10 @@ and ~description~:
   (trivial-inspect:description (find-class 'standard-class) t)
   ;; Standard-class #<STANDARD-CLASS COMMON-LISP:STANDARD-CLASS>
 #+end_src
+
+~fields~ returns a list of inspect properties.
+Each property is a list of
+- Index
+- Property name (either index, keyword, or some standard library symbol, usually a getter function)
+- Value of the property
+- And optional setter to override this property. A function of two arguments—new value and old value.
