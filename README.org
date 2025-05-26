@@ -23,7 +23,17 @@ And then load ~:trivial-inspect~ in the REPL:
 You can also use the bundled ~guix.scm~ to install it on Guix.
 
 * APIs
-Two main entry points of this library are ~fields~:
+Two main entry points of this library are ~fields~ and ~description~:
+
+** fields (object) -> fields
+
+~fields~ returns a list of inspect properties for a given object
+Each property is a list of
+- Index
+- Property name (either index, keyword, or some standard library symbol, usually a getter function)
+- Value of the property
+- And optional setter to override this property. A function of two arguments—new value and old value.
+
 #+begin_src lisp
   (trivial-inspect:fields #'identity)
   ;; ((0 :self #<function identity>) (1 :id 1407351035)
@@ -48,7 +58,12 @@ Two main entry points of this library are ~fields~:
   ;;   (#<sb-mop:standard-effective-slot-definition sb-pcl::%type> #<sb-mop:standard-effective-slot-definition sb-pcl::source> ..)))
 #+end_src
 
-and ~description~:
+** description (object &optional stream)
+
+~description~ returns/prints a human-readable description of the given object.
+Quite opinionated, but optimized for maximum useful info.
+Usually includes type and printable representation, possibly followed by prettified ~fields~ and other info.
+
 #+begin_src lisp
   (trivial-inspect:description #'+ t)
   ;; Compiled-function + (&REST NUMBERS)
@@ -59,10 +74,3 @@ and ~description~:
   (trivial-inspect:description (find-class 'standard-class) t)
   ;; Standard-class #<STANDARD-CLASS COMMON-LISP:STANDARD-CLASS>
 #+end_src
-
-~fields~ returns a list of inspect properties.
-Each property is a list of
-- Index
-- Property name (either index, keyword, or some standard library symbol, usually a getter function)
-- Value of the property
-- And optional setter to override this property. A function of two arguments—new value and old value.
