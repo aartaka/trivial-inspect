@@ -61,7 +61,7 @@ Each property is a list of
 ** description (object &optional stream)
 
 ~description~ returns/prints a human-readable description of the given object.
-Quite opinionated, but optimized for maximum useful info.
+Quite opinionated, but optimized for maximum useful info (if you have an idea for a better format, I'm open to discussion!)
 Usually includes type and printable representation, possibly followed by prettified ~fields~ and other info.
 
 #+begin_src lisp
